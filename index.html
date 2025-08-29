@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CinéMasterpieces — Movie Blog</title>
+  <meta name="description" content="A clean, responsive movie blog for masterpiece films. HTML + CSS + JavaScript." />
+  <link rel="preconnect" href="https://picsum.photos">
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --panel: #121826;
+      --muted: #8a94a6;
+      --text: #e6eaf2;
+      --accent: #eab308; /* golden */
+      --accent-2: #64b5f6; /* soft blue */
+      --chip: #1b2437;
+      --card: #0f1625;
+      --border: #243049;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius-lg: 18px;
+      --radius-sm: 10px;
+    }
+
+    /* Light mode */
+    html.light {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --muted: #657082;
+      --text: #0f1222;
+      --accent: #b45309;
+      --accent-2: #1d4ed8;
+      --chip: #eef2ff;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --shadow: 0 10px 30px rgba(17, 24, 39, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg), #0a0d13 80%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 18px; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(8px);
+      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .4px; }
+    .brand .logo {
+      width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+      background: radial-gradient(circle at 30% 30%, var(--accent), var(--accent-2));
+      color: #0b0e14; font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    .links { display: flex; gap: 14px; flex-wrap: wrap; }
+    .links a { padding: 8px 12px; border-radius: 999px; background: var(--chip); border: 1px solid var(--border); font-weight: 600; font-size: 14px; }
+
+    .searchbar { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .searchbar input {
+      background: var(--panel); color: var(--text);
+      border: 1px solid var(--border); border-radius: 999px; padding: 10px 14px; min-width: 220px;
+      outline: none; box-shadow: var(--shadow);
+    }
+    .btn { border: 1px solid var(--border); background: var(--panel); color: var(--text); padding: 10px 12px; border-radius: 999px; cursor: pointer; }
+    .btn:hover { transform: translateY(-1px); }
+
+    /* Hero */
+    .hero {
+      position: relative; overflow: hidden; border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.7)),
+        url('https://picsum.photos/1600/600?blur=3&random=11') center/cover no-repeat;
+      min-height: 280px; display: grid; align-items: end;
+      box-shadow: var(--shadow);
+    }
+    .hero .content { padding: 28px; }
+    .hero h1 { margin: 0 0 10px; font-size: clamp(28px, 4vw, 42px); }
+    .hero p { margin: 0; color: #d1d7e3; max-width: 60ch; }
+
+    /* Filter chips */
+    .chips { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+    .chip { padding: 8px 12px; border-radius: 999px; background: var(--chip); border: 1px solid var(--border); cursor: pointer; font-weight: 600; font-size: 14px; }
+    .chip.active { outline: 2px solid var(--accent-2); }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin: 12px 0 18px; flex-wrap: wrap; }
+    select.sort { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 10px 12px; }
+
+    /* Layout */
+    .grid {
+      display: grid; grid-template-columns: 1fr; gap: 18px;
+    }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 2fr 1fr; }
+    }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+    .meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .title { font-weight: 800; margin: 0; font-size: 18px; line-height: 1.25; }
+    .excerpt { color: var(--muted); font-size: 14px; }
+    .taglist { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { font-size: 12px; padding: 4px 8px; background: var(--chip); border: 1px solid var(--border); border-radius: 999px; }
+
+    .actions { display: flex; gap: 8px; margin-top: auto; }
+    .btn.primary { background: linear-gradient(135deg, var(--accent-2), var(--accent)); border: none; color: #0b0e14; font-weight: 800; }
+    .btn.ghost { background: transparent; }
+
+    .rating { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+    .rating svg { width: 16px; height: 16px; fill: var(--accent); }
+
+    /* Sidebar */
+    aside { display: flex; flex-direction: column; gap: 18px; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow); }
+    .panel h3 { margin-top: 0; }
+    .list { display: grid; gap: 12px; }
+    .list-item { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
+    .list-item img { height: 64px; object-fit: cover; }
+
+    /* Footer */
+    footer { margin-top: 28px; padding: 24px 0; color: var(--muted); text-align: center; border-top: 1px solid var(--border); }
+
+    /* Drawer / Modal */
+    dialog { border: none; border-radius: var(--radius-lg); padding: 0; background: var(--panel); color: var(--text); width: min(920px, 92vw); box-shadow: var(--shadow); }
+    dialog::backdrop { background: rgba(0,0,0,.6); backdrop-filter: blur(2px); }
+    .article {
+      display: grid; grid-template-columns: 1fr; gap: 0;
+    }
+    .article header { position: relative; border: none; }
+    .article-hero { height: 240px; border-top-left-radius: var(--radius-lg); border-top-right-radius: var(--radius-lg); background-size: cover; background-position: center; }
+    .article-body { padding: 18px; }
+    .article-body h2 { margin-top: 0; }
+    .article-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 18px 18px; }
+    .close-x { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.5); border: 1px solid var(--border); color: #fff; border-radius: 999px; padding: 8px 10px; cursor: pointer; }
+
+    /* Empty states */
+    .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo">🎬</div>
+        <div>
+          <div style="font-size: 18px">CinéMasterpieces</div>
+          <small style="color:var(--muted)">All-time great films, curated.</small>
+        </div>
+      </div>
+      <nav class="links">
+        <a href="#" data-link="home">Home</a>
+        <a href="#" data-link="reviews">Reviews</a>
+        <a href="#" data-link="lists">Lists</a>
+        <a href="#" id="openWatchlist">Watchlist</a>
+        <a href="#" data-link="about">About</a>
+      </nav>
+      <div class="searchbar">
+        <input id="search" type="search" placeholder="Search masterpieces… (e.g., noir)" />
+        <button id="themeToggle" class="btn" title="Toggle theme">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="content">
+        <h1>Explore Masterpiece Films</h1>
+        <p>Dive into critic-loved cinema: classics, world cinema, animation gems, and modern auteurs. Reviews, lists, and deep dives—updated by fans like you.</p>
+        <div class="chips" id="chips"></div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div style="display:flex; gap:10px; align-items:center">
+        <span style="color:var(--muted)">Filter:</span>
+        <div class="chips" id="quickChips"></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center">
+        <label for="sort" style="color:var(--muted)">Sort</label>
+        <select class="sort" id="sort">
+          <option value="new">Newest</option>
+          <option value="rating">Highest Rated</option>
+          <option value="az">A → Z</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section>
+        <div class="cards" id="cards"></div>
+        <div id="empty" class="empty" hidden>No matches. Try clearing filters or searching a different term.</div>
+      </section>
+      <aside>
+        <div class="panel">
+          <h3>Top Rated</h3>
+          <div class="list" id="topRated"></div>
+        </div>
+        <div class="panel">
+          <h3>Trending Tags</h3>
+          <div class="chips" id="tagCloud"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> CinéMasterpieces — Built with HTML, CSS, and JavaScript.</div>
+  </footer>
+
+  <!-- Article Modal -->
+  <dialog id="articleModal">
+    <div class="article">
+      <header>
+        <div id="articleHero" class="article-hero"></div>
+        <button class="close-x" id="closeArticle">✕</button>
+      </header>
+      <div class="article-body">
+        <h2 id="articleTitle"></h2>
+        <p id="articleMeta" style="color:var(--muted)"></p>
+        <p id="articleText"></p>
+        <h3>Leave a comment</h3>
+        <form id="commentForm" style="display:flex; gap:8px; margin:10px 0">
+          <input type="text" id="commentInput" placeholder="Your thoughts…" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--card); color:var(--text)" />
+          <button class="btn primary" type="submit">Post</button>
+        </form>
+        <div id="comments" class="list"></div>
+      </div>
+      <div class="article-footer">
+        <div class="rating" id="articleRating"></div>
+        <button id="articleBookmark" class="btn">🔖 Add to Watchlist</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Watchlist Drawer -->
+  <dialog id="watchlistModal">
+    <div style="padding:18px; max-width:720px">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px">
+        <h3 style="margin:0">Your Watchlist</h3>
+        <button class="btn" id="closeWatchlist">Close</button>
+      </div>
+      <div id="watchlist" class="list"></div>
+      <div id="watchlistEmpty" class="empty" hidden>No saved films yet. Click 🔖 on any card to add it here.</div>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Data ---
+    const MOVIES = [
+  { id: 'bk-2001', title: '2001: A Space Odyssey', year: 1968, genres: ['Sci-Fi', 'Classics'], rating: 9.2,
+    author: 'Kubrick Circle', date: '2024-11-01',
+    img: 'https://picsum.photos/seed/odyssey/800/500',
+    excerpt: 'A hypnotic journey beyond the infinite — bold visuals, minimal dialogue, and monoliths that changed cinema.',
+    text: 'Kubrick\'s operatic meditation on evolution and technology rearranged what science fiction could be. From the bone match cut to the enigmatic star gate, its symphonies of image and sound invite contemplation more than explanation.' },
+
+  { id: 'bk-sev', title: 'Seven Samurai', year: 1954, genres: ['World', 'Action', 'Classics'], rating: 9.0,
+    author: 'Auteurs Guild', date: '2025-03-11',
+    img: 'https://picsum.photos/seed/samurai/800/500',
+    excerpt: 'Kurosawa\'s humanist epic blends strategy, sacrifice, and mud-soaked heroism.',
+    text: 'A template for the team-up movie, yet richer than its imitators: character by character, we learn why protection is a form of dignity. The rainy battle remains peerless.' },
+
+  { id: 'bk-god', title: 'The Godfather', year: 1972, genres: ['Crime', 'Drama', 'Classics'], rating: 9.3,
+    author: 'Film School', date: '2025-01-06',
+    img: 'https://picsum.photos/seed/godfather/800/500',
+    excerpt: 'An American saga of family, empire, and consequence. Offers you can\'t refuse.',
+    text: 'Coppola crafts a slow-burn tragedy where loyalty and rot entwine. Every shadowed room breathes with power shifting hands.' },
+
+  { id: 'bk-spirit', title: 'Spirited Away', year: 2001, genres: ['Animation', 'Fantasy', 'World'], rating: 8.9,
+    author: 'Ghibli Notes', date: '2024-09-21',
+    img: 'https://picsum.photos/seed/spiritedaway/800/500',
+    excerpt: 'A bathhouse of spirits, a girl\'s courage, and the magic of the mundane.',
+    text: 'Miyazaki conjures a realm that is strange yet kind. It\'s a film about labor, greed, names, and remembering who you are.' },
+
+  { id: 'bk-vert', title: 'Vertigo', year: 1958, genres: ['Thriller', 'Drama', 'Classics'], rating: 8.7,
+    author: 'Hitch Lab', date: '2025-05-12',
+    img: 'https://picsum.photos/seed/vertigo/800/500',
+    excerpt: 'Desire spirals into obsession in Hitchcock\'s most haunting puzzle-box.',
+    text: 'A study in looking and being looked at. The dolly zoom births a feeling: falling in place. Herrmann\'s score lingers like a ghost.' },
+
+  { id: 'bk-city', title: 'City of God', year: 2002, genres: ['Crime', 'World', 'Drama'], rating: 8.6,
+    author: 'Favela Frames', date: '2024-12-02',
+    img: 'https://picsum.photos/seed/cityofgod/800/500',
+    excerpt: 'Lives blaze and vanish in Rio\'s favelas—kinetic, funny, and devastating.',
+    text: 'With whip-fast edits and generous character work, it never loses sight of the kids trapped between swagger and survival.' },
+
+  { id: 'bk-solaris', title: 'Solaris', year: 1972, genres: ['Sci-Fi', 'World', 'Drama'], rating: 8.1,
+    author: 'Tarkovskian', date: '2024-06-10',
+    img: 'https://picsum.photos/seed/solaris/800/500',
+    excerpt: 'A slow river of memory and guilt aboard a haunted space station.',
+    text: 'Tarkovsky replaces hardware fetish with metaphysical doubt. The planet mirrors our ache rather than our ambitions.' },
+
+  { id: 'bk-ps', title: 'Parasite', year: 2019, genres: ['Drama', 'Thriller', 'World'], rating: 8.5,
+    author: 'Bong Hive', date: '2025-02-10',
+    img: 'https://picsum.photos/seed/parasite/800/500',
+    excerpt: 'A class satire that slides from comedy to horror without missing a beat.',
+    text: 'The staircase becomes a social diagram; the flood, a reckoning. It\'s tight, mordant, and shockingly humane.' },
+
+  { id: 'bk-spiral', title: 'Spiral of Silence', year: 1964, genres: ['World', 'Drama'], rating: 7.9,
+    author: 'RetroScope', date: '2023-10-05',
+    img: 'https://picsum.photos/seed/spiral/800/500',
+    excerpt: 'Underrated Eastern European gem about conformity and courage.',
+    text: 'Sparse compositions, huge implications. A reminder that silence can be the loudest complicity.' },
+
+  // --- New Films Added ---
+  { id: 'bk-shaw', title: 'The Shawshank Redemption', year: 1994, genres: ['Drama', 'Classics'], rating: 9.3,
+    author: 'Prison Tales', date: '2024-08-15',
+    img: 'https://picsum.photos/seed/shawshank/800/500',
+    excerpt: 'Hope is a dangerous thing — but sometimes, it sets you free.',
+    text: 'Darabont adapts King with tenderness. Freeman’s narration and Robbins’ quiet resolve create one of cinema’s great friendships.' },
+
+  { id: 'bk-dark', title: 'The Dark Knight', year: 2008, genres: ['Action', 'Thriller', 'Drama'], rating: 9.0,
+    author: 'Gotham Watch', date: '2024-07-20',
+    img: 'https://picsum.photos/seed/darkknight/800/500',
+    excerpt: 'Chaos vs order, with Batman and Joker locked in a moral duel.',
+    text: 'Ledger’s Joker is indelible: a scarred clown anarchist. Nolan’s set-pieces thrum with dread and weight.' },
+
+  { id: 'bk-casa', title: 'Casablanca', year: 1942, genres: ['Drama', 'Romance', 'Classics'], rating: 8.8,
+    author: 'Golden Age Review', date: '2023-12-25',
+    img: 'https://picsum.photos/seed/casablanca/800/500',
+    excerpt: 'Of all the gin joints, in all the towns, in all the world...',
+    text: 'Bogart and Bergman are timeless. A romance set against the fog of war becomes cinema’s great farewell.' },
+
+  { id: 'bk-lotr', title: 'The Lord of the Rings: The Fellowship of the Ring', year: 2001, genres: ['Fantasy', 'Adventure'], rating: 8.8,
+    author: 'Middle-earth Review', date: '2024-05-01',
+    img: 'https://picsum.photos/seed/fellowship/800/500',
+    excerpt: 'Nine companions, one journey to destroy a ring of power.',
+    text: 'Jackson weaves Tolkien’s myth with grandeur and intimacy. A saga of courage and temptation.' },
+
+  { id: 'bk-pulp', title: 'Pulp Fiction', year: 1994, genres: ['Crime', 'Drama'], rating: 8.9,
+    author: 'Tarantino Club', date: '2025-01-19',
+    img: 'https://picsum.photos/seed/pulpfiction/800/500',
+    excerpt: 'A nonlinear crime anthology: hitmen, boxers, diners, and redemption.',
+    text: 'Tarantino bends time, dialogue, and pop culture into a violent jazz riff.' },
+
+  { id: 'bk-amadeus', title: 'Amadeus', year: 1984, genres: ['Drama', 'Biopic'], rating: 8.4,
+    author: 'Stage & Screen', date: '2024-03-11',
+    img: 'https://picsum.photos/seed/amadeus/800/500',
+    excerpt: 'The rivalry between Mozart and Salieri — genius vs mediocrity.',
+    text: 'Forman’s lush period drama mixes jealousy, music, and divine madness in equal measure.' }
+];
+
+
+    const ALL_GENRES = Array.from(new Set(MOVIES.flatMap(m => m.genres)));
+
+    // --- State ---
+    let state = {
+      query: '',
+      genre: 'All',
+      sort: 'new',
+      bookmarks: new Set(JSON.parse(localStorage.getItem('bookmarks') || '[]')),
+      theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'),
+      openArticle: null
+    };
+
+    // --- Elements ---
+    const cardsEl = document.getElementById('cards');
+    const chipsEl = document.getElementById('chips');
+    const quickChipsEl = document.getElementById('quickChips');
+    const searchEl = document.getElementById('search');
+    const sortEl = document.getElementById('sort');
+    const tagCloudEl = document.getElementById('tagCloud');
+    const topRatedEl = document.getElementById('topRated');
+    const emptyEl = document.getElementById('empty');
+    const articleModal = document.getElementById('articleModal');
+    const watchlistModal = document.getElementById('watchlistModal');
+    const openWatchlistBtn = document.getElementById('openWatchlist');
+    const closeWatchlistBtn = document.getElementById('closeWatchlist');
+    const watchlistEl = document.getElementById('watchlist');
+    const watchlistEmptyEl = document.getElementById('watchlistEmpty');
+
+    // Article elements
+    const articleHero = document.getElementById('articleHero');
+    const articleTitle = document.getElementById('articleTitle');
+    const articleMeta = document.getElementById('articleMeta');
+    const articleText = document.getElementById('articleText');
+    const articleRating = document.getElementById('articleRating');
+    const articleBookmark = document.getElementById('articleBookmark');
+    const commentForm = document.getElementById('commentForm');
+    const commentInput = document.getElementById('commentInput');
+    const comments = document.getElementById('comments');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Theme init
+    document.documentElement.classList.toggle('light', state.theme === 'light');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.classList.toggle('light', state.theme === 'light');
+      localStorage.setItem('theme', state.theme);
+    });
+
+    // Build chips
+    function renderChips() {
+      const chips = ['All', ...ALL_GENRES];
+      chipsEl.innerHTML = chips.map(g => `<button class="chip ${state.genre===g?'active':''}" data-genre="${g}">${g}</button>`).join('');
+      quickChipsEl.innerHTML = ['Classics','World','Sci‑Fi','Drama','Crime','Animation'].map(g => `<button class="chip ${state.genre===g?'active':''}" data-genre="${g}">${g}</button>`).join('');
+      [...chipsEl.querySelectorAll('.chip'), ...quickChipsEl.querySelectorAll('.chip')].forEach(ch => ch.addEventListener('click', () => {
+        state.genre = ch.dataset.genre;
+        render();
+      }));
+    }
+
+    function starSVG(){
+      return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.4 8.168L12 18.896 4.666 23.165l1.4-8.168L.132 9.21l8.2-1.192z"/></svg>`;
+    }
+
+    function ratingNode(r) {
+      return `<span class="rating" title="${r} / 10">${starSVG()} ${r.toFixed(1)}</span>`;
+    }
+
+    function matches(movie) {
+      const q = state.query.toLowerCase();
+      const inGenre = state.genre === 'All' || movie.genres.includes(state.genre);
+      const inText = !q || movie.title.toLowerCase().includes(q) || movie.excerpt.toLowerCase().includes(q) || movie.text.toLowerCase().includes(q);
+      return inGenre && inText;
+    }
+
+    function sortMovies(list) {
+      const arr = list.slice();
+      if (state.sort === 'rating') arr.sort((a,b) => b.rating - a.rating);
+      else if (state.sort === 'az') arr.sort((a,b) => a.title.localeCompare(b.title));
+      else arr.sort((a,b) => new Date(b.date) - new Date(a.date));
+      return arr;
+    }
+
+    function renderCards() {
+      const filtered = sortMovies(MOVIES.filter(matches));
+      cardsEl.innerHTML = filtered.map(m => `
+        <article class="card" data-id="${m.id}">
+          <img src="${m.img}" alt="${m.title} poster">
+          <div class="meta">
+            <h3 class="title">${m.title} <small style="color:var(--muted)">(${m.year})</small></h3>
+            ${ratingNode(m.rating)}
+          </div>
+          <div class="taglist">${m.genres.map(g => `<span class="tag">${g}</span>`).join('')}</div>
+          <p class="excerpt">${m.excerpt}</p>
+          <div class="actions">
+            <button class="btn primary read">Read review</button>
+            <button class="btn ${state.bookmarks.has(m.id)?'':'ghost'} bookmark">${state.bookmarks.has(m.id) ? '🔖 Saved' : '🔖 Save'}</button>
+          </div>
+          <small style="color:var(--muted)">By ${m.author} • ${new Date(m.date).toLocaleDateString()}</small>
+        </article>`).join('');
+      emptyEl.hidden = filtered.length !== 0;
+
+      // Wire up actions
+      cardsEl.querySelectorAll('.read').forEach(btn => btn.addEventListener('click', (e) => {
+        const id = e.target.closest('.card').dataset.id;
+        openArticle(id);
+      }));
+      cardsEl.querySelectorAll('.bookmark').forEach(btn => btn.addEventListener('click', (e) => {
+        const id = e.target.closest('.card').dataset.id;
+        toggleBookmark(id);
+      }));
+    }
+
+    function renderSidebar() {
+      const top = MOVIES.slice().sort((a,b)=>b.rating-a.rating).slice(0,5);
+      topRatedEl.innerHTML = top.map(t => `
+        <a class="list-item" href="#" data-id="${t.id}">
+          <img src="${t.img}" alt="${t.title}">
+          <div>
+            <div style="font-weight:800">${t.title}</div>
+            <div style="color:var(--muted); font-size:13px">${t.year} • ${ratingNode(t.rating)}</div>
+          </div>
+        </a>`).join('');
+      topRatedEl.querySelectorAll('a').forEach(a => a.addEventListener('click', (e)=>{ e.preventDefault(); openArticle(a.dataset.id); }));
+
+      const tags = ALL_GENRES;
+      tagCloudEl.innerHTML = tags.map(t => `<button class="chip" data-genre="${t}">${t}</button>`).join('');
+      tagCloudEl.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()=>{ state.genre = ch.dataset.genre; render(); window.scrollTo({top: 0, behavior:'smooth'}); }));
+    }
+
+    // Watchlist
+    function toggleBookmark(id){
+      if (state.bookmarks.has(id)) state.bookmarks.delete(id); else state.bookmarks.add(id);
+      localStorage.setItem('bookmarks', JSON.stringify([...state.bookmarks]));
+      renderCards();
+      renderWatchlist();
+    }
+
+    function renderWatchlist(){
+      const items = MOVIES.filter(m => state.bookmarks.has(m.id));
+      watchlistEl.innerHTML = items.map(m => `
+        <div class="list-item">
+          <img src="${m.img}" alt="${m.title}">
+          <div>
+            <div style="display:flex; justify-content:space-between; gap:10px; align-items:center">
+              <strong>${m.title}</strong>
+              <div>${ratingNode(m.rating)}</div>
+            </div>
+            <small style="color:var(--muted)">${m.year} • ${m.genres.join(', ')}</small>
+            <div style="margin-top:6px; display:flex; gap:8px">
+              <button class="btn" onclick="openArticle('${m.id}')">Read</button>
+              <button class="btn" onclick="toggleBookmark('${m.id}')">Remove</button>
+            </div>
+          </div>
+        </div>`).join('');
+      watchlistEmptyEl.hidden = items.length !== 0;
+    }
+
+    openWatchlistBtn.addEventListener('click', (e)=>{ e.preventDefault(); renderWatchlist(); watchlistModal.showModal(); });
+    closeWatchlistBtn.addEventListener('click', ()=> watchlistModal.close());
+
+    // Article modal
+    function openArticle(id){
+      const m = MOVIES.find(x=>x.id===id);
+      if (!m) return;
+      state.openArticle = id;
+      articleHero.style.backgroundImage = `linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.6)), url('${m.img}')`;
+      articleTitle.textContent = `${m.title} (${m.year})`;
+      articleMeta.innerHTML = `${m.genres.join(' • ')} • <strong>${ratingNode(m.rating)}</strong> • By ${m.author} on ${new Date(m.date).toLocaleDateString()}`;
+      articleText.textContent = m.text + ' ' + m.text; // make it feel lengthier
+      articleRating.innerHTML = ratingNode(m.rating);
+      articleBookmark.textContent = state.bookmarks.has(id) ? '🔖 In Watchlist' : '🔖 Add to Watchlist';
+      loadComments(id);
+      articleModal.showModal();
+    }
+
+    document.getElementById('closeArticle').addEventListener('click', ()=> articleModal.close());
+    articleBookmark.addEventListener('click', ()=>{ if(state.openArticle) toggleBookmark(state.openArticle); articleBookmark.textContent = state.bookmarks.has(state.openArticle) ? '🔖 In Watchlist' : '🔖 Add to Watchlist'; });
+
+    // Comments (local only)
+    function loadComments(id){
+      const list = JSON.parse(localStorage.getItem('comments:'+id) || '[]');
+      comments.innerHTML = list.map(c => `<div class="panel">${c}</div>`).join('');
+    }
+
+    commentForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const txt = commentInput.value.trim();
+      if (!txt || !state.openArticle) return;
+      const key = 'comments:'+state.openArticle;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      list.unshift(txt);
+      localStorage.setItem(key, JSON.stringify(list));
+      commentInput.value='';
+      loadComments(state.openArticle);
+    });
+
+    // Search & sort
+    searchEl.addEventListener('input', () => { state.query = searchEl.value; renderCards(); });
+    sortEl.addEventListener('change', () => { state.sort = sortEl.value; renderCards(); });
+
+    function render(){
+      renderChips();
+      renderCards();
+      renderSidebar();
+    }
+
+    // Kickoff
+    render();
+  </script>
+</body>
+</html>
